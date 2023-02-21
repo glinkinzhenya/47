@@ -15,17 +15,6 @@ async function controller(type = "GET", action, body) {
     return data;
 };
 
-
-// отправить
-async function post(path, obj) {
-    await controller("POST", `${API}/${path}`, {
-        name: obj.name,
-        comics: obj.comics,
-        favourite: obj.favourite,
-    })
-}
-
-
 // получаем категории
 const heroComics = document.getElementById("heroComics");
 
@@ -41,102 +30,97 @@ async function getСategories() {
 getСategories()
 
 
-// удаляем героев
-// async function deletePerson(number) {
-//     const data = await controller("DELETE", `${API}/heroes/${number}`);
-// }
-
-
 // Кнопка добавить героя
-const button = document.getElementById("button");
+const button = document.getElementById("heroesForm");
+
 const heroName = document.getElementById("heroName");
 const heroFavourite = document.getElementById("heroFavourite");
 
-button.addEventListener("click", async (e) => {
-
+button.addEventListener("submit", async (e) => {
     e.preventDefault();
-    console.log(heroName.value);
-    console.log(heroComics.value);
-    console.log(heroFavourite.checked);
 
     const data = await controller("GET", `${API}/heroes`);
     console.log(data);
 
     if (data.find(i => i.name === heroName.value)) {
+
         alert(`${heroName.value} уже существует`)
+
     } else {
-        await post("heroes", { name: heroName.value, comics: heroComics.value, favourite: heroFavourite.checked });
-        persons.innerHTML = ""
-        getRenders()
+
+        const response = await controller("POST", `${API}/heroes`, {
+            name: heroName.value,
+            comics: heroComics.value,
+            favourite: heroFavourite.checked,
+        })
+
+        getPerson(response);
     }
 });
 
-// изменить данные
 
-async function putPerson(number, check) {
-    const data = await controller("PUT", `${API}/heroes/${number}`, {
-        favourite: check,
-    })
+// Запрос с сервера всех персонажей
+async function getRenders() {
+
+    const data = await controller("GET", `${API}/heroes`);
+
+    if (data.length !== 0) {
+        data.forEach(element => {
+            getPerson(element);
+        })
+    }
 }
 
-
-// Получить данные и отрендерить
-async function getRenders() {
-    const data = await controller("GET", `${API}/heroes`);
-    console.log(data);
+// Отрендерить персонажа
+async function getPerson(element) {
 
     const persons = document.getElementById("persons");
-    data.forEach(element => {
 
-        const tr = document.createElement("tr");
+    const tr = document.createElement("tr");
 
-        const tdName = document.createElement("td");
-        tdName.innerText = `${element.name}`
-        tr.append(tdName);
+    tr.id = `${element.id}`;
 
-        const tdComics = document.createElement("td");
-        tdComics.innerText = `${element.comics}`
-        tr.append(tdComics);
+    const tdName = document.createElement("td");
+    tdName.innerText = `${element.name}`
+    tr.append(tdName);
 
-        const tdFavourite = document.createElement("td");
-        const label = document.createElement("label");
-        label.classList.add("heroFavouriteInput");
-        label.innerText = `Favourite:`;
-        const input = document.createElement("input");
+    const tdComics = document.createElement("td");
+    tdComics.innerText = `${element.comics}`
+    tr.append(tdComics);
 
-        input.setAttribute("id", `${element.id}`);
-        const id = document.getElementById(`${element.id}`);
-        input.addEventListener("click", () => {
-            putPerson(element.id, document.getElementById(`${element.id}`).checked)
-        });
+    const tdFavourite = document.createElement("td");
+    const label = document.createElement("label");
+    label.classList.add("heroFavouriteInput");
+    label.classList.add("checkbox");
+    label.innerText = `Favourite:`;
+    const input = document.createElement("input");
 
-        input.setAttribute("type", `checkbox`);
-        if (element.favourite === true) input.setAttribute("checked", "");
+    input.addEventListener("click", async () => {
 
-        label.append(input);
-        tdFavourite.append(label);
-        tr.append(tdFavourite);
-
-        const tdButton = document.createElement("td");
-        const button = document.createElement("button");
-        button.innerText = `Delete`;
-        tdButton.append(button);
-        tr.append(tdButton);
-        button.addEventListener("click", async () => {
-            // await deletePerson(element.id);
-            await controller("DELETE", `${API}/heroes/${element.id}`)
-
-
-            persons.innerHTML = ""
-            getRenders()
-        });
-
-        persons.append(tr);
+        const data = await controller("PUT", `${API}/heroes/${element.id}`, {
+            favourite: document.querySelector(`.checkbox>input`).checked,
+        })
     });
+
+    input.setAttribute("type", `checkbox`);
+    if (element.favourite === true) input.setAttribute("checked", "");
+
+    label.append(input);
+    tdFavourite.append(label);
+    tr.append(tdFavourite);
+
+    const tdButton = document.createElement("td");
+    const button = document.createElement("button");
+    button.innerText = `Delete`;
+    tdButton.append(button);
+    tr.append(tdButton);
+    button.addEventListener("click", () => {
+
+        controller("DELETE", `${API}/heroes/${element.id}`)
+        const del = document.getElementById(element.id);
+        del.remove();
+    });
+
+    persons.prepend(tr);
 }
 getRenders()
-
-
-
-
-
