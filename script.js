@@ -29,7 +29,6 @@ async function getСategories() {
 }
 getСategories()
 
-
 // Кнопка добавить героя
 const button = document.getElementById("heroesForm");
 
@@ -42,7 +41,6 @@ button.addEventListener("submit", async (e) => {
 
     if (data.find(i => i.name === heroName.value)) {
         alert(`${heroName.value} уже существует`)
-
     } else {
         const response = await controller("POST", `${API}/heroes`, {
             name: heroName.value,
@@ -86,14 +84,12 @@ async function getPerson(element) {
     const tdFavourite = document.createElement("td");
     const label = document.createElement("label");
     label.classList.add("heroFavouriteInput");
-    label.classList.add("checkbox");
     label.innerText = `Favourite:`;
     const input = document.createElement("input");
 
     input.addEventListener("click", async () => {
-
         const data = await controller("PUT", `${API}/heroes/${element.id}`, {
-            favourite: document.querySelector(`.checkbox>input`).checked,
+            favourite: input.checked,
         })
     });
 
