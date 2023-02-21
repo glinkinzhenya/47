@@ -38,22 +38,17 @@ const heroFavourite = document.getElementById("heroFavourite");
 
 button.addEventListener("submit", async (e) => {
     e.preventDefault();
-
     const data = await controller("GET", `${API}/heroes`);
-    console.log(data);
 
     if (data.find(i => i.name === heroName.value)) {
-
         alert(`${heroName.value} уже существует`)
 
     } else {
-
         const response = await controller("POST", `${API}/heroes`, {
             name: heroName.value,
             comics: heroComics.value,
             favourite: heroFavourite.checked,
         })
-
         getPerson(response);
     }
 });
