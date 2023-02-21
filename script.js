@@ -51,17 +51,13 @@ button.addEventListener("submit", async (e) => {
     }
 });
 
-
 // Запрос с сервера всех персонажей
 async function getRenders() {
-
     const data = await controller("GET", `${API}/heroes`);
-
-    if (data.length !== 0) {
-        data.forEach(element => {
-            getPerson(element);
-        })
-    }
+    data.forEach(element => {
+        getPerson(element);
+        console.log(data);
+    })
 }
 
 // Отрендерить персонажа
