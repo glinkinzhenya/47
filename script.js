@@ -112,8 +112,7 @@ async function getPerson(element) {
     button.addEventListener("click", () => {
 
         controller("DELETE", `${API}/heroes/${element.id}`)
-        const del = document.getElementById(element.id);
-        del.remove();
+        document.getElementById(element.id).remove();
     });
 
     persons.prepend(tr);
